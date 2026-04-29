@@ -217,4 +217,161 @@ export default function App() {
                   React.createElement("th", {style:{padding:"7px",background:"#f5f7fc",textAlign:"left",color:"#555",fontWeight:700,minWidth:66,borderBottom:"1px solid #e0e6f0",position:"sticky",left:0,zIndex:3}}, "スタッフ"),
                   days.map(function(d){
                     var dow=new Date(year,month,d).getDay();
-                    return React.createElement("th", {key:d,style:{padding:"3px 1px",background:"#f5f7fc",textAlign:"center",minWidth:40,color:dow===0?"#e05a5a":dow===6?"#4f86c6":"#444",borderBottom:"1px solid #e0e6f0",fontWeight:600​​​​​​​​​​​​​​​​
+                    return React.createElement("th", {key:d,style:{padding:"3px 1px",background:"#f5f7fc",textAlign:"center",minWidth:40,color:dow===0?"#e05a5a":dow===6?"#4f86c6":"#444",borderBottom:"1px solid #e0e6f0",fontWeight:600}},
+                      React.createElement("div",{style:{fontSize:11}},d),
+                      React.createElement("div",{style:{fontSize:9,fontWeight:400}},DAYS_JP[dow]),
+                      React.createElement("div",{style:{fontSize:10,minHeight:14}},allLocsCovered(d)?"✅":"")
+                    );
+                  }),
+                  React.createElement("th", {style:{padding:"7px 5px",background:"#f5f7fc",color:"#555",fontWeight:700,minWidth:56,borderBottom:"1px solid #e0e6f0"}}, "休日")
+                ),
+                React.createElement("tr", null,
+                  React.createElement("td", {style:{padding:"3px 7px",background:"#eef1f8",fontSize:10,color:"#888",fontWeight:700,borderBottom:"2px solid #d0d8ee",position:"sticky",left:0,zIndex:2}}, "牧場"),
+                  days.map(function(d){
+                    return React.createElement("td", {key:d,style:{padding:"2px 1px",background:"#eef1f8",borderBottom:"2px solid #d0d8ee"}},
+                      React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:1,alignItems:"center"}},
+                        LOCATIONS.map(function(l){
+                          return React.createElement("div",{key:l.id,style:{width:26,height:7,borderRadius:2,background:isLocCovered(l.id,d)?l.color:"#dde2f0"}});
+                        })
+                      )
+                    );
+                  }),
+                  React.createElement("td", {style:{background:"#eef1f8",borderBottom:"2px solid #d0d8ee"}})
+                )
+              ),
+              React.createElement("tbody", null,
+                staff.map(function(s,si){
+                  var holDays=staffHolidayDays(s.id);
+                  var holOk=holDays>=requiredHolidays;
+                  return React.createElement("tr", {key:s.id,style:{background:si%2===0?"#fff":"#fafbfd"}},
+                    React.createElement("td", {style:{padding:"4px 7px",fontWeight:600,color:"#1a2235",borderBottom:"1px solid #eef0f6",position:"sticky",left:0,background:si%2===0?"#fff":"#fafbfd",zIndex:1}},
+                      editingId===s.id
+                        ? React.createElement("input",{value:editingName,onChange:function(e){setEditingName(e.target.value);},onBlur:function(){setStaff(function(prev){return prev.map(function(x){return x.id===s.id?Object.assign({},x,{name:editingName}):x;});});setEditingId(null);},autoFocus:true,style:{border:"1px solid #4f86c6",borderRadius:4,padding:"2px 4px",fontSize:12,width:56}})
+                        : React.createElement("span",{onDoubleClick:function(){setEditingId(s.id);setEditingName(s.name);},style:{cursor:"text"}},s.name)
+                    ),
+                    days.map(function(d){
+                      var ds=getShiftsForDay(s.id,d);
+                      var hol=getHoliday(s.id,d);
+                      return React.createElement("td",{key:d,style:{padding:"2px 1px",borderBottom:"1px solid #eef0f6"}},
+                        hol
+                          ? React.createElement("div",{className:"cell",onClick:function(){openModal(s.id,d);},style:{background:hol==="paid"?"#fff0f0":"#f0f0f0",border:"1.5px solid "+(hol==="paid"?"#e05a5a":"#bbb")}},
+                              React.createElement("span",{style:{fontSize:9,fontWeight:700,color:hol==="paid"?"#e05a5a":"#999"}},hol==="paid"?"有休":"休日")
+                            )
+                          : React.createElement("div",{className:"cell"+(ds.length===0?" empty":""),onClick:function(){openModal(s.id,d);}},
+                              ds.length===0?"+" : ds.map(function(sh){
+                                return React.createElement("div",{key:sh.loc.id,style:{background:sh.loc.color,color:"#fff",borderRadius:3,padding:"1px 2px",width:"100%",textAlign:"center",fontSize:9,fontWeight:700}},sh.loc.name.slice(0,2));
+                              })
+                            )
+                      );
+                    }),
+                    React.createElement("td",{style:{padding:"4px 5px",textAlign:"center",borderBottom:"1px solid #eef0f6"}},
+                      React.createElement("div",{style:{fontSize:14}},holOk?"✅":"⚠️"),
+                      React.createElement("div",{style:{fontSize:10,fontWeight:700,color:holOk?"#5cb85c":"#e05a5a"}},holDays+"/"+requiredHolidays)
+                    )
+                  );
+                })
+              )
+            )
+          )
+        ),
+        view==="summary" && React.createElement("div",{style:{background:"#fff",borderRadius:14,boxShadow:"0 2px 12px #0001",overflow:"auto"}},
+          React.createElement("div",{style:{padding:"12px 14px 4px",fontWeight:700,fontSize:15,color:"#1a2235"}},"勤務集計 — "+year+"年"+(month+1)+"月"),
+          React.createElement("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:12}},
+            React.createElement("thead",null,
+              React.createElement("tr",null,
+                React.createElement("th",{style:{padding:"8px 10px",background:"#f5f7fc",textAlign:"left",color:"#555",borderBottom:"2px solid #e0e6f0"}},"スタッフ"),
+                LOCATIONS.map(function(l){ return React.createElement("th",{key:l.id,style:{padding:"8px 6px",background:"#f5f7fc",textAlign:"center",color:l.color,borderBottom:"2px solid #e0e6f0",fontWeight:700,fontSize:11}},l.name); }),
+                React.createElement("th",{style:{padding:"8px 6px",background:"#f5f7fc",textAlign:"center",color:"#e05a5a",borderBottom:"2px solid #e0e6f0",fontWeight:700}},"有休"),
+                React.createElement("th",{style:{padding:"8px 6px",background:"#f5f7fc",textAlign:"center",color:"#888",borderBottom:"2px solid #e0e6f0",fontWeight:700}},"休日"),
+                React.createElement("th",{style:{padding:"8px 6px",background:"#f5f7fc",textAlign:"center",color:"#1a2235",borderBottom:"2px solid #e0e6f0",fontWeight:700}},"実働")
+              )
+            ),
+            React.createElement("tbody",null,
+              summary.map(function(item,i){
+                return React.createElement("tr",{key:item.s.id,style:{background:i%2===0?"#fff":"#fafbfd"}},
+                  React.createElement("td",{style:{padding:"8px 10px",fontWeight:600,borderBottom:"1px solid #eef0f6"}},item.s.name),
+                  LOCATIONS.map(function(l){ return React.createElement("td",{key:l.id,style:{padding:"8px 6px",textAlign:"center",borderBottom:"1px solid #eef0f6",color:item.byLoc[l.id]?l.color:"#ddd",fontWeight:item.byLoc[l.id]?700:400}},item.byLoc[l.id]?minutesToHHMM(item.byLoc[l.id]):"—"); }),
+                  React.createElement("td",{style:{padding:"8px 6px",textAlign:"center",borderBottom:"1px solid #eef0f6",color:item.paidDays?"#e05a5a":"#ddd"}},item.paidDays?item.paidDays+"日":"—"),
+                  React.createElement("td",{style:{padding:"8px 6px",textAlign:"center",borderBottom:"1px solid #eef0f6"}},
+                    React.createElement("span",{style:{fontWeight:700,color:item.holOk?"#5cb85c":"#e05a5a"}},(item.holOk?"✅":"⚠️")+" "+item.holDays+"日")
+                  ),
+                  React.createElement("td",{style:{padding:"8px 6px",textAlign:"center",fontWeight:700,color:"#1a2235",borderBottom:"1px solid #eef0f6"}},minutesToHHMM(item.totalWork))
+                );
+              })
+            )
+          )
+        )
+      ),
+      modal && React.createElement("div",{style:{position:"fixed",inset:0,background:"#0007",display:"flex",alignItems:"flex-end",justifyContent:"center",zIndex:100},onClick:function(e){if(e.target===e.currentTarget)setModal(null);}},
+        React.createElement("div",{style:{background:"#fff",borderRadius:"20px 20px 0 0",padding:"20px 20px 36px",width:"100%",maxWidth:500,boxShadow:"0 -8px 40px #0003"}},
+          React.createElement("div",{style:{width:40,height:4,background:"#dde",borderRadius:2,margin:"0 auto 14px"}}),
+          React.createElement("div",{style:{fontWeight:700,fontSize:15,color:"#1a2235",marginBottom:4}},
+            (modalStaff?modalStaff.name:"")+" ／ "+(month+1)+"月"+modal.day+"日("+DAYS_JP[new Date(year,month,modal.day).getDay()]+")"
+          ),
+          step==="top" && React.createElement("div",null,
+            React.createElement("div",{style:{color:"#888",fontSize:13,marginBottom:12}},"牧場を選ぶか、休日を設定してください"),
+            React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}},
+              LOCATIONS.map(function(l){
+                var existing=getShift(l.id,modal.staffId,modal.day);
+                var covered=isLocCovered(l.id,modal.day);
+                return React.createElement("button",{key:l.id,className:"big-btn",onClick:function(){selectLocation(l.id);},style:{background:l.color,color:"#fff",position:"relative",boxShadow:existing?"0 0 0 3px "+l.color+"55":"none"}},
+                  covered&&!existing&&React.createElement("span",{style:{position:"absolute",top:7,left:9,fontSize:11}},"✅"),
+                  l.name,
+                  React.createElement("div",{style:{fontSize:10,fontWeight:400,marginTop:3,opacity:0.88}},existing?existing.start+"〜"+existing.end:l.start+"〜"+l.end),
+                  existing&&React.createElement("span",{style:{position:"absolute",top:7,right:9,background:"#fff4",borderRadius:8,padding:"1px 6px",fontSize:10}},"編集")
+                );
+              })
+            ),
+            React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}},
+              React.createElement("button",{className:"big-btn",onClick:function(){saveHoliday("off");},style:{background:modalHoliday==="off"?"#aaa":"#f0f0f0",color:modalHoliday==="off"?"#fff":"#666",border:modalHoliday==="off"?"none":"1.5px solid #ddd"}},
+                "😴 休日",modalHoliday==="off"&&React.createElement("div",{style:{fontSize:10,fontWeight:400,marginTop:2}},"設定済み")
+              ),
+              React.createElement("button",{className:"big-btn",onClick:function(){setStep("holiday");},style:{background:modalHoliday==="paid"?"#e05a5a":"#fff0f0",color:modalHoliday==="paid"?"#fff":"#e05a5a",border:modalHoliday==="paid"?"none":"1.5px solid #f5c0c0"}},
+                "📋 有休",modalHoliday==="paid"&&React.createElement("div",{style:{fontSize:10,fontWeight:400,marginTop:2}},"設定済み")
+              )
+            ),
+            (modalHoliday||getShiftsForDay(modal.staffId,modal.day).length>0)&&React.createElement("button",{onClick:function(){clearDay(modal.staffId,modal.day);},style:{width:"100%",padding:"10px 0",borderRadius:10,marginBottom:8,border:"1.5px solid #e0e6f0",background:"#fff",color:"#e05a5a",fontWeight:600,cursor:"pointer",fontSize:13}},"🗑 この日の設定をすべて削除"),
+            React.createElement("button",{onClick:function(){setModal(null);},style:{width:"100%",padding:"10px 0",borderRadius:10,border:"1.5px solid #e0e6f0",background:"#fff",color:"#888",fontWeight:600,cursor:"pointer",fontSize:13}},"キャンセル")
+          ),
+          step==="holiday" && React.createElement("div",null,
+            React.createElement("div",{style:{background:"#fff8f8",border:"1.5px solid #f5c0c0",borderRadius:12,padding:"16px",marginBottom:16,textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:28,marginBottom:8}},"📋"),
+              React.createElement("div",{style:{fontWeight:700,fontSize:16,color:"#e05a5a",marginBottom:4}},"有給休暇"),
+              React.createElement("div",{style:{fontSize:13,color:"#888"}},"この日を有休として記録します")
+            ),
+            React.createElement("div",{style:{display:"flex",gap:8}},
+              React.createElement("button",{onClick:function(){setStep("top");},style:{flex:1,padding:"12px 0",borderRadius:10,border:"1.5px solid #e0e6f0",background:"#fff",color:"#888",fontWeight:600,cursor:"pointer",fontSize:13}},"← 戻る"),
+              React.createElement("button",{onClick:function(){saveHoliday("paid");},style:{flex:2,padding:"12px 0",borderRadius:10,border:"none",background:"#e05a5a",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15}},"有休として保存")
+            )
+          ),
+          step==="time" && selLoc && React.createElement("div",null,
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,margin:"8px 0 14px"}},
+              React.createElement("button",{onClick:function(){setStep("top");},style:{background:"#f0f2f7",border:"none",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:13,color:"#555",fontWeight:600}},"← 戻る"),
+              React.createElement("span",{style:{background:selLoc.color,color:"#fff",borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:700}},selLoc.name)
+            ),
+            React.createElement("div",{style:{background:"#f8f9fc",borderRadius:10,padding:"8px 14px",marginBottom:14,fontSize:12,color:"#666"}},"☕ 休憩 "+selLoc.breakStart+"〜"+selLoc.breakEnd+"（"+selLoc.breakMin+"分）"),
+            React.createElement("div",{style:{display:"flex",gap:12,alignItems:"center",marginBottom:14}},
+              React.createElement("div",{style:{flex:1}},
+                React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:4}},"開始時間"),
+                React.createElement("input",{type:"time",value:editStart,onChange:function(e){setEditStart(e.target.value);},style:{width:"100%",padding:"10px",border:"1.5px solid #c5cde0",borderRadius:8,fontSize:16}})
+              ),
+              React.createElement("div",{style:{paddingTop:18,color:"#aaa",fontSize:18}},"〜"),
+              React.createElement("div",{style:{flex:1}},
+                React.createElement("div",{style:{fontSize:12,color:"#888",marginBottom:4}},"終了時間"),
+                React.createElement("input",{type:"time",value:editEnd,onChange:function(e){setEditEnd(e.target.value);},style:{width:"100%",padding:"10px",border:"1.5px solid #c5cde0",borderRadius:8,fontSize:16}})
+              )
+            ),
+            React.createElement("div",{style:{borderRadius:10,padding:"10px 0",marginBottom:16,background:selLoc.color+"18",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:11,color:"#888",marginBottom:2}},"実働時間（休憩除く）"),
+              React.createElement("div",{style:{fontWeight:700,fontSize:18,color:selLoc.color}},minutesToHHMM(shiftDur(editStart,editEnd,selLoc.breakMin)))
+            ),
+            React.createElement("div",{style:{display:"flex",gap:8}},
+              React.createElement("button",{onClick:deleteShift,style:{flex:1,padding:"12px 0",borderRadius:10,border:"1.5px solid #f5d0d0",background:"#fff8f8",color:"#e05a5a",fontWeight:600,cursor:"pointer",fontSize:13}},"削除"),
+              React.createElement("button",{onClick:saveShift,style:{flex:2,padding:"12px 0",borderRadius:10,border:"none",background:selLoc.color,color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15}},"保存")
+            )
+          )
+        )
+      )
+    )
+  );
+}
