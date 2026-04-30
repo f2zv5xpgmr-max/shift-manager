@@ -16,7 +16,7 @@ const LOCATIONS = [
   { id: 2, name: "美野牧場",     color: "#5cb85c", start: "07:00", end: "17:00", breakMin: 120, breakStart: "11:00", breakEnd: "13:00" },
   { id: 3, name: "第一牧場", color: "#e09c45", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
   { id: 4, name: "第二牧場", color: "#9b59b6", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
-  { id: 5, name: "市場",     color: "#e05a5a",  
+  { id: 5, name: "市場",     color: "#e05a5a",start: "07:00", end: "17:00", breakMin: 60, breakStart: "11:00", breakEnd: "13:00" },  
 ];
 
 const REQUIRED_WORK_DAYS = 25;
