@@ -56,9 +56,21 @@ export default function App() {
   const [month, setMonth] = useState(today.getMonth());
   const [view, setView]   = useState("calendar");
   const [staff, setStaff] = useState(() => loadData("staff", INIT_STAFF));
-  const [shifts,   setShifts]   = useState(() => loadData("shifts",   {}));
+  const [shifts, setShifts] = useState(() => {
+  const [holidays, setHolidays] = useState(() => {
+  const saved = loadData("holidays", {});
+  const savedMonth = loadData("shiftsMonth", null);
+  const now = new Date();
+  if (savedMonth !== now.getFullYear() + "-" + now.getMonth()) return {};
+  return saved;
+});
+  const savedMonth = loadData("shiftsMonth", null);
+  const now = new Date();
+  if (savedMonth !== now.getFullYear() + "-" + now.getMonth()) return {};
+  return saved;
+});
   const [holidays, setHolidays] = useState(() => loadData("holidays", {}));
-
+  useEffect(() => { const now = new Date(); saveData("shiftsMonth", now.getFullYear() + "-" + now.getMonth()); }, []);
   const [modal,     setModal]     = useState(null);
   const [step,      setStep]      = useState("top");
   const [selLocId,  setSelLocId]  = useState(null);
