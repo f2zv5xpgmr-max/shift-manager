@@ -12,12 +12,12 @@ const INIT_STAFF = [
 ];
 
 const LOCATIONS = [
-  { id: 1, name: "高倉牧場",     color: "#4f86c6", start: "07:00", end: "17:00", breakMin: 120, breakStart: "11:00", breakEnd: "13:00" },
-  { id: 2, name: "美野牧場",     color: "#5cb85c", start: "07:00", end: "17:00", breakMin: 120, breakStart: "11:00", breakEnd: "13:00" },
-  { id: 3, name: "植月第一牧場", color: "#e09c45", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
-  { id: 4, name: "植月第二牧場", color: "#9b59b6", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
+  { id: 1, name: "\u9ad8\u5009\u7267\u5834", color: "#4f86c6", start: "07:00", end: "17:00", breakMin: 120, breakStart: "11:00", breakEnd: "13:00" },
+  { id: 2, name: "\u7f8e\u91ce\u7267\u5834", color: "#5cb85c", start: "07:00", end: "17:00", breakMin: 120, breakStart: "11:00", breakEnd: "13:00" },
+  { id: 3, name: "\u7b2c\u4e00", color: "#e09c45", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
+  { id: 4, name: "\u7b2c\u4e8c", color: "#9b59b6", start: "06:00", end: "18:00", breakMin: 240, breakStart: "10:00", breakEnd: "14:00" },
+  { id: 5, name: "\u5e02\u5834", color: "#e05a5a", start: "07:00", end: "17:00", breakMin: 60, breakStart: "12:00", breakEnd: "13:00" },
 ];
-
 const REQUIRED_WORK_DAYS = 25;
 const DAYS_JP = ["日", "月", "火", "水", "木", "金", "土"];
 
